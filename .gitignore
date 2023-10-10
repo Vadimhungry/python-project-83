@@ -6,3 +6,4 @@ dist/
 test_files/
 .coverage
 coverage.xml
+.env
