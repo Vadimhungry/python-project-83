@@ -79,6 +79,7 @@ def show_urls():
 @app.get('/urls/<int:id>')
 def show_url(id):
     messages = get_flashed_messages(with_categories=True)
+    status = False
     for message in messages:
         status, _ = message
 
