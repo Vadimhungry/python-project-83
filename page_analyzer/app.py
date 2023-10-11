@@ -37,7 +37,7 @@ def check_url():
     if url_is_valid and len(url) < 255:
         parsed_url = urlparse(url)
         norm_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
-        with psycopg2.connect("dbname=anal_dev user=Number1") as db:
+        with psycopg2.connect(app.config['DATABASE_URL']) as db:
             with db.cursor() as cursor:
                 cursor.execute("SELECT * FROM urls WHERE name = %s;", (norm_url,))
                 url_in_bd = cursor.fetchone()
@@ -64,7 +64,7 @@ def check_url():
 
 @app.get('/urls')
 def show_urls():
-    with psycopg2.connect("dbname=anal_dev user=Number1") as db:
+    with psycopg2.connect(app.config['DATABASE_URL']) as db:
         with db.cursor() as cursor:
             cursor.execute("SELECT id, name FROM urls ORDER BY id DESC;")
             sites = cursor.fetchall()
@@ -84,7 +84,7 @@ def show_url(id):
 
     query = 'SELECT * FROM urls WHERE id = (%s)'
 
-    with psycopg2.connect("dbname=anal_dev user=Number1") as db:
+    with psycopg2.connect(app.config['DATABASE_URL']) as db:
         with db.cursor() as cursor:
             cursor.execute(query, (id,))
             site_id, site_url, date = cursor.fetchone()
