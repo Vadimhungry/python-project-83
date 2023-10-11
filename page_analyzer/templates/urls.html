@@ -42,16 +42,20 @@
     </thead>
     <tbody>
     {% for site in sites %}
-      {% set id, url  = site %}
+      {% set id, url, last_check  = site %}
       <tr>
-          <td>{{ id }}</td>
+          <td>
+            {{ id }}
+          </td>
           <td>
             <a href="/urls/{{ id }}">
               {{ url }}
             </a>
           </td>
 
-          <td></td>
+          <td>
+            {{ last_check }}
+          </td>
 
           <td></td>
 
@@ -69,7 +73,7 @@
       <a href="https://ru.hexlet.io/" target="_blank">Hexlet</a>
     </div>
   </div>
-candid
+
 </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"

@@ -30,7 +30,7 @@ def index():
 
 
 @app.post('/urls')
-def check_url():
+def add_url():
     url = request.form.to_dict()['url']
     url_is_valid = validate_url(url)
 
@@ -39,7 +39,9 @@ def check_url():
         norm_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
         with psycopg2.connect(app.config['DATABASE_URL']) as db:
             with db.cursor() as cursor:
-                cursor.execute("SELECT * FROM urls WHERE name = %s;", (norm_url,))
+                cursor.execute(
+                    "SELECT * FROM urls WHERE name = %s;", (norm_url,)
+                )
                 url_in_bd = cursor.fetchone()
 
                 if url_in_bd is not None:
@@ -50,8 +52,12 @@ def check_url():
                         code=302
                     )
 
-                cursor.execute("INSERT INTO urls (name) VALUES (%s)", (norm_url,))
-                cursor.execute("SELECT * FROM urls WHERE name = %s;", (norm_url,))
+                cursor.execute(
+                    "INSERT INTO urls (name) VALUES (%s)", (norm_url,)
+                )
+                cursor.execute(
+                    "SELECT * FROM urls WHERE name = %s;", (norm_url,)
+                )
                 url_id = cursor.fetchone()[0]
         flash('Страница успешно добавлена', 'success')
         return redirect(
@@ -66,9 +72,16 @@ def check_url():
 def show_urls():
     with psycopg2.connect(app.config['DATABASE_URL']) as db:
         with db.cursor() as cursor:
-            cursor.execute("SELECT id, name FROM urls ORDER BY id DESC;")
+            cursor.execute(
+                '''
+                SELECT urls.id, urls.name, MAX(url_checks.created_at)
+                FROM urls
+                LEFT JOIN url_checks
+                ON urls.id = url_checks.url_id
+                GROUP BY urls.id
+                ORDER BY urls.id DESC;'''
+            )
             sites = cursor.fetchall()
-
 
     return render_template(
         'urls.html',
@@ -83,21 +96,41 @@ def show_url(id):
     for message in messages:
         status, _ = message
 
-    query = 'SELECT * FROM urls WHERE id = (%s)'
-
     with psycopg2.connect(app.config['DATABASE_URL']) as db:
         with db.cursor() as cursor:
-            cursor.execute(query, (id,))
+            cursor.execute('SELECT * FROM urls WHERE id = (%s)', (id,))
             site_id, site_url, date = cursor.fetchone()
-    site_date = date.strftime('%Y-%m-%d')
+            site_date = date.strftime('%Y-%m-%d')
+            cursor.execute(
+                '''
+                SELECT id, created_at
+                FROM url_checks
+                WHERE url_id = (%s)
+                ORDER BY id DESC
+                ''',
+                (id,)
+            )
+            url_checks = cursor.fetchall()
 
     return render_template(
         'url.html',
         status=status,
         site_id=site_id,
         site_url=site_url,
-        site_date=site_date
+        site_date=site_date,
+        url_checks=url_checks
     )
+
+
+@app.post('/urls/<int:id>/checks')
+def check_url(id):
+    with psycopg2.connect(app.config['DATABASE_URL']) as db:
+        with db.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO url_checks (url_id) VALUES (%s)",
+                (id,)
+            )
+    return redirect(url_for('show_url', id=id))
 
 
 if __name__ == '__main__':
