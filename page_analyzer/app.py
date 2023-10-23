@@ -22,6 +22,7 @@ app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
 successful_http_responses = [200, 201, 204, 202, 203, 205, 206, 207, 208]
 
+
 @app.route('/')
 def index():
     messages = get_flashed_messages()
@@ -77,13 +78,13 @@ def show_urls():
         with db.cursor() as cursor:
             cursor.execute(
                 '''
-                SELECT 
-                    DISTINCT ON (url_id) url_id, 
-                    urls.name, 
-                    url_checks.created_at, 
+                SELECT
+                    DISTINCT ON (url_id) url_id,
+                    urls.name,
+                    url_checks.created_at,
                     status_code
-                FROM 
-                    url_checks 
+                FROM
+                    url_checks
                 JOIN urls ON urls.id=url_checks.url_id
                 ORDER BY url_id, created_at DESC;'''
             )
@@ -149,14 +150,23 @@ def check_url(id):
                     h1 = ''
                 title = soup.title.string
 
-                description_text = soup.find('meta', attrs={'name': 'description'}).get('content')
+                description_text = soup.find(
+                    'meta',
+                    attrs={'name': 'description'}
+                ).get('content')
                 if len(description_text) > 255:
-                    description = ' '.join(description_text[:252].split(' ')[:-1]) + '...'
+                    description_words = description_text[:252].split(' ')[:-1]
+                    description_cut = ' '.join(description_words)
+                    description = description_cut + '...'
                 else:
                     description = description_text
 
                 cursor.execute(
-                    "INSERT INTO url_checks (url_id, status_code, h1, title, description) VALUES (%s, %s, %s, %s, %s);",
+                    '''
+                    INSERT INTO
+                        url_checks(url_id, status_code, h1, title, description)
+                    VALUES
+                        (%s, %s, %s, %s, %s);''',
                     (id, status_code, h1, title, description)
                 )
                 flash('Страница успешно проверена', 'checked')
