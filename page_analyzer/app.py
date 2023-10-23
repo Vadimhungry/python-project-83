@@ -149,7 +149,11 @@ def check_url(id):
                     h1 = ''
                 title = soup.title.string
 
-                description = soup.find('meta', attrs={'name': 'description'}).get('content')
+                description_text = soup.find('meta', attrs={'name': 'description'}).get('content')
+                if len(description_text) > 255:
+                    description = description_text[:252] + '...'
+                else:
+                    description = description_text
 
                 cursor.execute(
                     "INSERT INTO url_checks (url_id, status_code, h1, title, description) VALUES (%s, %s, %s, %s, %s);",
