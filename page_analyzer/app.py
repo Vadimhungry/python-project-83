@@ -151,7 +151,7 @@ def check_url(id):
 
                 description_text = soup.find('meta', attrs={'name': 'description'}).get('content')
                 if len(description_text) > 255:
-                    description = description_text[:252] + '...'
+                    description = ' '.join(description_text[:252].split(' ')[:-1]) + '...'
                 else:
                     description = description_text
 
