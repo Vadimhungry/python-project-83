@@ -11,13 +11,16 @@ from urllib.parse import urlparse
 from validators.url import url as validate_url
 import psycopg2
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 import os
+import requests
 
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = '123456789_qwerty'
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
+successful_http_responses = [200, 201, 204, 202, 203, 205, 206, 207, 208]
 
 @app.route('/')
 def index():
@@ -74,12 +77,15 @@ def show_urls():
         with db.cursor() as cursor:
             cursor.execute(
                 '''
-                SELECT urls.id, urls.name, MAX(url_checks.created_at)
-                FROM urls
-                LEFT JOIN url_checks
-                ON urls.id = url_checks.url_id
-                GROUP BY urls.id
-                ORDER BY urls.id DESC;'''
+                SELECT 
+                    DISTINCT ON (url_id) url_id, 
+                    urls.name, 
+                    url_checks.created_at, 
+                    status_code
+                FROM 
+                    url_checks 
+                JOIN urls ON urls.id=url_checks.url_id
+                ORDER BY url_id, created_at DESC;'''
             )
             sites = cursor.fetchall()
 
@@ -103,10 +109,10 @@ def show_url(id):
             site_date = date.strftime('%Y-%m-%d')
             cursor.execute(
                 '''
-                SELECT id, created_at
+                SELECT id,status_code, h1, title, description, created_at
                 FROM url_checks
                 WHERE url_id = (%s)
-                ORDER BY id DESC
+                ORDER BY id DESC;
                 ''',
                 (id,)
             )
@@ -124,12 +130,34 @@ def show_url(id):
 
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
+
     with psycopg2.connect(app.config['DATABASE_URL']) as db:
         with db.cursor() as cursor:
             cursor.execute(
-                "INSERT INTO url_checks (url_id) VALUES (%s)",
+                "SELECT name FROM urls WHERE id=(%s);",
                 (id,)
             )
+            url = (cursor.fetchone())[0]
+            request = requests.get(url)
+            status_code = request.status_code
+            if status_code in successful_http_responses:
+                soup = BeautifulSoup(request.text, 'html.parser')
+
+                if soup.h1 is not None:
+                    h1 = soup.h1.text
+                else:
+                    h1 = ''
+                title = soup.title.string
+
+                description = soup.find('meta', attrs={'name': 'description'}).get('content')
+
+                cursor.execute(
+                    "INSERT INTO url_checks (url_id, status_code, h1, title, description) VALUES (%s, %s, %s, %s, %s);",
+                    (id, status_code, h1, title, description)
+                )
+                flash('Страница успешно проверена', 'checked')
+            else:
+                flash('Произошла ошибка при проверке', 'check-error')
     return redirect(url_for('show_url', id=id))
 
 

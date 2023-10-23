@@ -42,7 +42,7 @@
     </thead>
     <tbody>
     {% for site in sites %}
-      {% set id, url, last_check  = site %}
+      {% set id, url, last_check, status  = site %}
       <tr>
           <td>
             {{ id }}
@@ -57,7 +57,9 @@
             {{ last_check }}
           </td>
 
-          <td></td>
+          <td>
+            {{ status }}
+          </td>
 
       </tr>
     {% endfor %}
