@@ -1,9 +1,9 @@
-.DS_Store
 venv/
 dist/
 .idea/
-**/__pycache__
 test_files/
+**/__pycache__
+.env
+.DS_Store
 .coverage
 coverage.xml
-.env
