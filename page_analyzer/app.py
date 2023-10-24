@@ -150,10 +150,15 @@ def check_url(id):
                     h1 = ''
                 title = soup.title.string
 
-                description_text = soup.find(
+                description_tag = soup.find(
                     'meta',
                     attrs={'name': 'description'}
-                ).get('content')
+                )
+                if description_tag is not None:
+                    description_text = description_tag.get('content')
+                else:
+                    description_text = ''
+
                 if len(description_text) > 255:
                     description_words = description_text[:252].split(' ')[:-1]
                     description_cut = ' '.join(description_words)

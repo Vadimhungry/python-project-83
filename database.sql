@@ -1,6 +1,6 @@
 CREATE TABLE urls(
     id  bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name  varchar(255),
+    name  varchar(255) UNIQUE,
     created_at DATE DEFAULT CURRENT_DATE
 );
 
