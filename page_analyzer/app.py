@@ -69,7 +69,7 @@ def add_url():
             code=302
         )
     flash('Некорректный URL')
-    return redirect(url_for('index'))
+    return redirect(url_for('index')), 422
 
 
 @app.get('/urls')
