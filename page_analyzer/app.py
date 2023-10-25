@@ -39,6 +39,7 @@ def index():
 
 @app.post('/urls')
 def add_url():
+    # todo выделить парсинг в отдельный модуль
     url = request.form.to_dict()['url']
     url_is_valid = validate_url(url)
 
@@ -63,7 +64,7 @@ def add_url():
             code=302
         )
     flash('Некорректный URL')
-    return redirect(url_for('index'))
+    return render_template('index.html'), 422
 
 
 @app.get('/urls')
