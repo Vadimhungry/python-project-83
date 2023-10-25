@@ -10,7 +10,6 @@ from page_analyzer.db import (
     insert_url,
     insert_check
 )
-import psycopg2
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv

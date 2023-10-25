@@ -28,6 +28,7 @@ def get_url_info(id):
             site_date = date.strftime('%Y-%m-%d')
     return site_url, site_date
 
+
 def get_url_name(id):
     with psycopg2.connect(DATABASE_URL) as db:
         with db.cursor() as cursor:
@@ -69,6 +70,7 @@ def get_checks(id):
                 (id,)
             )
             return cursor.fetchall()
+
 
 def insert_url(url):
     with psycopg2.connect(DATABASE_URL) as db:
