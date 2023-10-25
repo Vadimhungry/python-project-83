@@ -3,18 +3,26 @@
 {% include 'head.html' %}
 <body class="min-vh-100 d-flex flex-column">
 {% include 'header.html' %}
-{% if status == 'success' %}
-    <div class="alert alert-success" role="alert">Страница успешно добавлена</div>
-{% endif %}
-{% if status == 'error' %}
-    <div class="alert alert-info" role="alert">Страница уже существует</div>
-{% endif %}
-{% if status == 'checked' %}
-    <div class="alert alert-success" role="alert">Страница успешно проверена</div>
-{% endif %}
-{% if status == 'check-error' %}
-    <div class="alert alert-danger" role="alert">Произошла ошибка при проверке</div>
-{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% for message in messages %}
+        {% if message[0] == 'success' %}
+            <div class="alert alert-success" role="alert">Страница успешно добавлена</div>
+        {% endif %}
+        {% if message[0] == 'error' %}
+            <div class="alert alert-info" role="alert">Страница уже существует</div>
+        {% endif %}
+        {% if message[0] == 'checked' %}
+            <div class="alert alert-success" role="alert">Страница успешно проверена</div>
+        {% endif %}
+        {% if message[0] == 'check-error' %}
+            <div class="alert alert-danger" role="alert">Произошла ошибка при проверке</div>
+        {% endif %}
+    {% endfor %}
+{% endwith %}
+
+
+
 <main class="flex-grow-1">
     <div class="container-lg mt-3">
         <h1>Сайт: {{ site_url }}</h1>
