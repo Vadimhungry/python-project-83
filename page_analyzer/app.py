@@ -26,7 +26,7 @@ from validators.url import url as validate_url
 
 load_dotenv()
 app = Flask(__name__)
-app.secret_key = '123456789_qwerty'
+app.secret_key = os.getenv('SECRET_KEY')
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
 successful_http_responses = [200, 201, 204, 202, 203, 205, 206, 207, 208]
@@ -125,6 +125,12 @@ def check_url(id):
         flash('Произошла ошибка при проверке', 'check-error')
 
     return redirect(url_for('show_url', id=id))
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 
 if __name__ == '__main__':
     app.run()
