@@ -1,17 +1,7 @@
 import os
 from urllib.parse import urlparse
-from page_analyzer.db import (
-    get_url,
-    get_url_id,
-    get_all_urls,
-    get_url_info,
-    get_checks,
-    get_url_name,
-    insert_url,
-    insert_check
-)
+
 import requests
-from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -22,6 +12,18 @@ from flask import (
     url_for
 )
 from validators.url import url as validate_url
+
+from page_analyzer.db import (
+    get_url,
+    get_url_id,
+    get_all_urls,
+    get_url_info,
+    get_checks,
+    get_url_name,
+    insert_url,
+    insert_check
+)
+from page_analyzer.parser import get_tags
 
 load_dotenv()
 app = Flask(__name__)
@@ -38,7 +40,6 @@ def index():
 
 @app.post('/urls')
 def add_url():
-    # todo выделить парсинг в отдельный модуль
     url = request.form.to_dict()['url']
     url_is_valid = validate_url(url)
 
@@ -91,35 +92,12 @@ def show_url(id):
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
     url = get_url_name(id)
-
     request = requests.get(url)
     status_code = request.status_code
+
     if status_code in successful_http_responses:
-        soup = BeautifulSoup(request.text, 'html.parser')
-
-        if soup.h1 is not None:
-            h1 = soup.h1.text
-        else:
-            h1 = ''
-        title = soup.title.string
-
-        description_tag = soup.find(
-            'meta',
-            attrs={'name': 'description'}
-        )
-        if description_tag is not None:
-            description_text = description_tag.get('content')
-        else:
-            description_text = ''
-
-        if len(description_text) > 255:
-            description_words = description_text[:252].split(' ')[:-1]
-            description_cut = ' '.join(description_words)
-            description = description_cut + '...'
-        else:
-            description = description_text
-
-        insert_check(id, status_code, h1, title, description)
+        tags = get_tags(request.text)
+        insert_check(id, status_code, *tags)
         flash('Страница успешно проверена', 'checked')
     else:
         flash('Произошла ошибка при проверке', 'check-error')
