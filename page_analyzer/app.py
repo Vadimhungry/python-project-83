@@ -38,7 +38,7 @@ def index():
 def add_url():
     url = request.form.get("url")
 
-    if is_valid_url(url) != True:
+    if is_valid_url(url) is not True:
         flash('Некорректный URL')
         return render_template('index.html'), 422
 
