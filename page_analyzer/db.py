@@ -6,6 +6,7 @@ from psycopg2.extras import DictCursor
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 
+
 class DatabaseConnection:
     def __enter__(self):
         self.db = psycopg2.connect(DATABASE_URL)
