@@ -6,7 +6,7 @@ def is_valid_url(url):
     errors = []
 
     if not check_url(url):
-        errors.append('Error! Url is invalid')
+        errors.append('Некорректный URL')
 
     if len(url) > 255:
         errors.append('Error! Url length > 255')
