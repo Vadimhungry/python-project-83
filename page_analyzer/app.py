@@ -37,9 +37,9 @@ def index():
 @app.post('/urls')
 def add_url():
     url = request.form.get("url")
-
     if is_valid_url(url) is not True:
-        flash('Некорректный URL')
+        for error in is_valid_url(url):
+            flash(error)
         return render_template('index.html'), 422
 
     norm_url = normalize_url(url)
