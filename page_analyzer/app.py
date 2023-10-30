@@ -47,7 +47,7 @@ def add_url():
 
     if url_in_bd is not None:
         flash('Страница уже существует', 'error')
-        url_id = url_in_bd[0]
+        url_id = url_in_bd['id']
         return redirect(
             url_for('show_url', id=url_id),
             code=302
@@ -74,20 +74,20 @@ def show_urls():
 
 @app.get('/urls/<int:id>')
 def show_url(id):
-    _, site_url, site_date = get_url_info(id)
+    url_info = get_url_info(id)
     url_checks = get_checks(id)
     return render_template(
         'url.html',
         site_id=id,
-        site_url=site_url,
-        site_date=site_date,
+        site_url=url_info['url'],
+        site_date=url_info['date'],
         url_checks=url_checks
     )
 
 
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
-    url = get_url_info(id)[1]
+    url = get_url_info(id)['url']
     request = requests.get(url)
     status_code = request.status_code
 

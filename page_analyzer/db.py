@@ -36,7 +36,7 @@ def get_url_info(id):
         cursor.execute('SELECT * FROM urls WHERE id = (%s)', (id,))
         site_id, site_url, date = cursor.fetchone()
         site_date = date.strftime('%Y-%m-%d')
-    return site_id, site_url, site_date
+    return {'id': id, 'url': site_url, 'date': site_date}
 
 
 def get_all_urls():
