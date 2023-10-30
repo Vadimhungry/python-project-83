@@ -11,6 +11,9 @@ CREATE TABLE url_checks(
     h1  varchar(255),
     title  varchar(255),
     description  varchar(255),
-    created_at DATE DEFAULT CURRENT_DATE
+    created_at DATE DEFAULT CURRENT_DATE,
+    CONSTRAINT fk_url
+      FOREIGN KEY(url_id)
+	  REFERENCES urls(id)
 );
 
