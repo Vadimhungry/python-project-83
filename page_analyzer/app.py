@@ -20,7 +20,8 @@ from page_analyzer.db import (
     insert_url,
     insert_check
 )
-from page_analyzer.parser import parse_ceo_tags, is_valid_url, normalize_url
+from page_analyzer.parser import parse_ceo_tags
+from page_analyzer.urls import is_valid_url, normalize_url
 
 load_dotenv()
 app = Flask(__name__)
