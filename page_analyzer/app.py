@@ -17,11 +17,10 @@ from page_analyzer.db import (
     get_all_urls,
     get_url_info,
     get_checks,
-    get_url_name,
     insert_url,
     insert_check
 )
-from page_analyzer.parser import get_tags, is_valid_url, normalize_url
+from page_analyzer.parser import parse_ceo_tags, is_valid_url, normalize_url
 
 load_dotenv()
 app = Flask(__name__)
@@ -74,7 +73,7 @@ def show_urls():
 
 @app.get('/urls/<int:id>')
 def show_url(id):
-    site_url, site_date = get_url_info(id)
+    _, site_url, site_date = get_url_info(id)
     url_checks = get_checks(id)
     return render_template(
         'url.html',
@@ -87,12 +86,12 @@ def show_url(id):
 
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
-    url = get_url_name(id)
+    url = get_url_info(id)[1]
     request = requests.get(url)
     status_code = request.status_code
 
     if status_code == 200:
-        tags = get_tags(request.text)
+        tags = parse_ceo_tags(request.text)
         insert_check(id, status_code, *tags)
         flash('Страница успешно проверена', 'checked')
     else:

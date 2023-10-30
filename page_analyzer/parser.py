@@ -23,7 +23,7 @@ def normalize_url(url):
     return f'{parsed_url.scheme}://{parsed_url.netloc}'
 
 
-def get_tags(content):
+def parse_ceo_tags(content):
     soup = BeautifulSoup(content, 'html.parser')
 
     if soup.h1 is not None:
