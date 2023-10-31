@@ -2,7 +2,7 @@ from urllib.parse import urlparse
 from validators.url import url as check_url
 
 
-def is_valid_url(url):
+def validate_url(url):
     errors = []
 
     if not check_url(url):
@@ -11,8 +11,6 @@ def is_valid_url(url):
     if len(url) > 255:
         errors.append('Error! Url length > 255')
 
-    if errors == []:
-        return True
     return errors
 
 

@@ -14,6 +14,7 @@ class DatabaseConnection:
         return self.cursor
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.db.commit()
         self.cursor.close()
         self.db.close()
 
@@ -51,7 +52,8 @@ def get_all_urls():
             FROM
                 url_checks
             JOIN urls ON urls.id=url_checks.url_id
-            ORDER BY url_id, created_at DESC;'''
+            ORDER BY url_id, created_at DESC;
+            '''
         )
         return cursor.fetchall()
 
@@ -71,21 +73,21 @@ def get_checks(id):
 
 
 def insert_url(url):
-    with psycopg2.connect(DATABASE_URL) as db:
-        with db.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO urls (name) VALUES (%s)", (url,)
-            )
+    with DatabaseConnection() as cursor:
+        cursor.execute(
+            "INSERT INTO urls (name) VALUES (%s)",
+            (url,)
+        )
 
 
 def insert_check(id, status_code, h1, title, description):
-    with psycopg2.connect(DATABASE_URL) as db:
-        with db.cursor() as cursor:
-            cursor.execute(
-                '''
-                INSERT INTO
-                    url_checks(url_id, status_code, h1, title, description)
-                VALUES
-                    (%s, %s, %s, %s, %s);''',
-                (id, status_code, h1, title, description)
-            )
+    with DatabaseConnection() as cursor:
+        cursor.execute(
+            '''
+            INSERT INTO
+                url_checks(url_id, status_code, h1, title, description)
+            VALUES
+                (%s, %s, %s, %s, %s);
+            ''',
+            (id, status_code, h1, title, description)
+        )

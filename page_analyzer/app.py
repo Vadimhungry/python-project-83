@@ -21,7 +21,7 @@ from page_analyzer.db import (
     insert_check
 )
 from page_analyzer.parser import parse_ceo_tags
-from page_analyzer.urls import is_valid_url, normalize_url
+from page_analyzer.urls import validate_url, normalize_url
 
 load_dotenv()
 app = Flask(__name__)
@@ -37,8 +37,9 @@ def index():
 @app.post('/urls')
 def add_url():
     url = request.form.get("url")
-    if is_valid_url(url) is not True:
-        for error in is_valid_url(url):
+    errors = validate_url(url)
+    if errors:
+        for error in errors:
             flash(error)
         return render_template('index.html'), 422
 
