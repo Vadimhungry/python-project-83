@@ -13,7 +13,6 @@ from flask import (
 
 from page_analyzer.db import (
     get_url,
-    get_url_id,
     get_all_urls,
     get_url_info,
     get_checks,
@@ -55,8 +54,7 @@ def add_url():
             code=302
         )
 
-    insert_url(norm_url)
-    url_id = get_url_id(norm_url)
+    url_id = insert_url(norm_url)
 
     flash('Страница успешно добавлена', 'success')
     return redirect(

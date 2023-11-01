@@ -8,7 +8,8 @@ def parse_ceo_tags(content):
         h1 = soup.h1.text
     else:
         h1 = ''
-    if soup.title.string:
+
+    if soup.title:
         title = soup.title.string
     else:
         title = ''

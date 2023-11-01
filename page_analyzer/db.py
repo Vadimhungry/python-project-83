@@ -28,10 +28,6 @@ def get_url(url):
     return url_in_bd
 
 
-def get_url_id(url):
-    return get_url(url)[0]
-
-
 def get_url_info(id):
     with DatabaseConnection() as cursor:
         cursor.execute('SELECT * FROM urls WHERE id = (%s)', (id,))
@@ -75,9 +71,10 @@ def get_checks(id):
 def insert_url(url):
     with DatabaseConnection() as cursor:
         cursor.execute(
-            "INSERT INTO urls (name) VALUES (%s)",
+            "INSERT INTO urls (name) VALUES (%s) RETURNING id",
             (url,)
         )
+        return cursor.fetchone()[0]
 
 
 def insert_check(id, status_code, h1, title, description):
