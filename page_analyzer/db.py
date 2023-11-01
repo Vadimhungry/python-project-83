@@ -50,7 +50,7 @@ def get_all_urls():
                 url_checks.created_at,
                 status_code
             FROM
-                url_checks RIGHT JOIN urls 
+                url_checks RIGHT JOIN urls
                 ON urls.id=url_checks.url_id
             ORDER BY urls.id, created_at DESC;
             '''
