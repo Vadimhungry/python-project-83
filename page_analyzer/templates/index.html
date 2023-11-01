@@ -3,16 +3,7 @@
 {% include 'head.html' %}
 <body class="min-vh-100 d-flex flex-column">
 {% include 'header.html' %}
-
-
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-danger" role="alert">{{ message }}</div>
-    {% endfor %}
-{% endif %}
-{% endwith %}
-
+{% include 'flash_messages.html' %}
 
 <main class="flex-grow-1">
     <div class="container-lg mt-3">

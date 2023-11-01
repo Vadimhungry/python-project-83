@@ -6,10 +6,10 @@ def validate_url(url):
     errors = []
 
     if not check_url(url):
-        errors.append('Некорректный URL')
+        errors.append(('Некорректный URL', 'danger'))
 
     if len(url) > 255:
-        errors.append('Error! Url length > 255')
+        errors.append(('Error! Url length > 255', 'danger'))
 
     return errors
 

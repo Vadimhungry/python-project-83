@@ -40,14 +40,15 @@ def add_url():
     errors = validate_url(url)
     if errors:
         for error in errors:
-            flash(error)
+            text, category = error
+            flash(text, category)
         return render_template('index.html'), 422
 
     norm_url = normalize_url(url)
     url_in_bd = get_url(norm_url)
 
     if url_in_bd is not None:
-        flash('Страница уже существует', 'error')
+        flash('Страница уже существует', 'info')
         url_id = url_in_bd['id']
         return redirect(
             url_for('show_url', id=url_id),
@@ -95,9 +96,9 @@ def check_url(id):
     if status_code == 200:
         tags = parse_ceo_tags(request.text)
         insert_check(id, status_code, *tags)
-        flash('Страница успешно проверена', 'checked')
+        flash('Страница успешно проверена', 'success')
     else:
-        flash('Произошла ошибка при проверке', 'check-error')
+        flash('Произошла ошибка при проверке', 'danger')
 
     return redirect(url_for('show_url', id=id))
 
