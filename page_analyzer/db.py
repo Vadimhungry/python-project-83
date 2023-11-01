@@ -45,14 +45,14 @@ def get_all_urls():
         cursor.execute(
             '''
             SELECT
-                DISTINCT ON (url_id) url_id,
+                DISTINCT ON (urls.id) urls.id,
                 urls.name,
                 url_checks.created_at,
                 status_code
             FROM
-                url_checks
-            JOIN urls ON urls.id=url_checks.url_id
-            ORDER BY url_id, created_at DESC;
+                url_checks RIGHT JOIN urls 
+                ON urls.id=url_checks.url_id
+            ORDER BY urls.id, created_at DESC;
             '''
         )
         return cursor.fetchall()
